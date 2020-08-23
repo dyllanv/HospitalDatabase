@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheet.css') }}"/>
+    </head>
+    <body>
+        <h1>Inpatient Census: Goon Squad</h1>
+        <div class="menu">
+            <a href="/">Home</a>
+            <a href="/patients">Patients</a>
+            <a href="/units">Units</a>
+            <a href="/doctors">Doctors</a>
+            <a class="active" href="/nurses">Nurses</a>
+        </div>
+        <h1>Nurses:</h1>
+        <form action="/nurses/results" method="POST">
+            <fieldset>
+                <input type="hidden" name="_method" value="SEARCH">
+                Search By Last Name:<input type = "txt" name="search">
+                <input type="submit" id="submit" value="Submit">
+            </fieldset>
+        </form>
+        {% if data["search"] %}
+        <table>
+            <thead>
+            <tr>
+                <th>RN Code</th>
+                <th>Name
+                <th>Sex
+                <th>On Duty
+                <th>Phone
+                <th>Delete
+            {% for item in data["search"] %}
+            <tr>
+                <td>{{item["rn_code"]}}</td>
+                <td><a href="/nurses/{{item['rn_code']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                <td>{{item["sex"]}}</td>
+                <td>{{item["on_duty"]}}
+                <td>{{item["phone"]}}</td>
+                <td>        
+                    <form action="/nurses" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="rn_code" value={{item['rn_code']}} required>
+                        <input type="submit" id="delete", value="Delete">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        <br>
+        <br>
+            <table id="nursesTable">
+                <thead>
+                <tr>
+                    <th>RN Code</th>
+                    <th>Name
+                    <th>Sex
+                    <th>On Duty
+                    <th>Phone
+                    <th>Delete
+            {% for item in data["nurses"] %}
+                <tr>
+                    <td>{{item["rn_code"]}}</a></td>
+                    <td><a href="/nurses/{{item['rn_code']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                    <td>{{item["sex"]}}</td>
+                    <td>{{item["on_duty"]}}</td>
+                    <td>{{item["phone"]}}</td>
+                    <td>        
+                        <form action="/nurses" method="POST">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="rn_code" value={{item['rn_code']}} required>
+                            <input type="submit" id="delete", value="Delete">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </table>
+        <h2>Add New Nurse</h2>
+        <form action="/nurses" method="POST">
+            <fieldset>
+                <input type="hidden" name="_method" value="ADD">
+                <input type="hidden" id="id">
+                Last Name<input type="text" name="lname" placeholder="Last Name" required>
+                First Name<input type="text" name="fname" placeholder="First Name" required>
+                Phone<input type="tel" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="XXX-XXX-XXXX" required>
+                <input type="radio" name="sex" value="0" checked=True>female<input type="radio" name="sex" value="1">male 
+                <br />
+                <input type="radio" name="duty" value="1" checked=True>On Duty <input type="radio" name="duty" value="0">Off Duty
+                <br />
+                <input type="submit" id="add" value="Add Nurse">
+            </fieldset>
+        </form>
+        <h2>Assign Nurse to Unit</h2>
+        <form action="/nurses" method="POST">
+            <fieldset>
+                <input type="hidden" name="_method" value="RELATION">
+                <select name="rn_code">
+                    {% for item in data["nurses"] %}
+                        <option value={{item["rn_code"]}}>{{item["last_name"]}}, {{item["first_name"]}}</option>
+                    {% endfor %}
+                </select> 
+                <select name="unit_id">
+                    {% for item in data["units"] %}
+                        <option value={{item["unit_id"]}}>{{item["name"]}}</option>
+                    {% endfor %}
+                </select> 
+                <input type="submit" id="delete", value="Assign">
+            </fieldset>
+        </form>
+    </body>
+</html>

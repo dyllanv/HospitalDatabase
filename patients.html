@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheet.css') }}"/>
+    </head>
+    <body>
+        <h1>Inpatient Census: Goon Squad</h1>
+        <div class="menu">
+            <a href="/">Home</a>
+            <a class="active" href="/patients">Patients</a>
+            <a href="/units">Units</a>
+            <a href="/doctors">Doctors</a>
+            <a href="/nurses">Nurses</a>
+        </div>
+        <h1>Patients:</h1>
+        <form action="/patients/results" method="POST">
+            <fieldset>
+                <input type="hidden" name="_method" value="SEARCH">
+                Search By Last Name:<input type = "txt" name="search">
+                <input type="submit" id="submit" value="Submit">
+            </fieldset>
+        </form>
+        {% if data["search"] %}
+        <table id="patientsTable">
+            <thead>
+            <tr>
+                <th>Patient ID
+                <th>Name
+                <th>Sex
+                <th>DOB
+                <th>Admit Date
+                <th>Ant. Discharge
+                <th>Dx
+                <th>Code
+                <th>Room
+                <th>Nurse
+                <th>Doctor
+                <th>Unit
+            {% for item in data["search"] %}
+            <tr>
+                <td>{{item["pat_id"]}}</td>
+                <td><a href="/patients/{{item['pat_id']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                <td>{{item["sex"]}}</td>
+                <td>{{item["dob"]}}
+                <td>{{item["admit_date"]}}</td>
+                <td>{{item["anticipated_discharge"]}}</td>
+                <td>{{item["diagnosis"]}}</td>
+                <td>{{item["code_status"]}}</td>
+                <td>{{item["room"]}}</td>
+                <td><a href="/nurses/{{item['rn_code']}}">{{item["rn_last"]}}, {{item["rn_first"]}}</a></td>
+                <td><a href="/doctors/{{item['dr_code']}}">{{item["dr_last"]}}, {{item["dr_first"]}}</a></td>
+                <td><a href="/units/{{item['unit_id']}}">{{item["name"]}}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+        <br>
+        <br>
+        <table id="patientsTable">
+            <thead>
+            <tr>
+                <th>Patient ID
+                <th>Name
+                <th>Sex
+                <th>DOB
+                <th>Admit Date
+                <th>Ant. Discharge
+                <th>Dx
+                <th>Code
+                <th>Room
+                <th>Nurse
+                <th>Doctor
+                <th>Unit
+
+        {% for item in data["patients"] %}
+            <tr>
+                <td>{{item["pat_id"]}}</td>
+                <td><a href="/patients/{{item['pat_id']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                <td>{{item["sex"]}}</td>
+                <td>{{item["dob"]}}</td>
+                <td>{{item["admit_date"]}}</td>
+                <td>{{item["anticipated_discharge"]}}</td>
+                <td>{{item["diagnosis"]}}</td>
+                <td>{{item["code_status"]}}</td>
+                <td>{{item["room"]}}</td>
+                <td><a href="/nurses/{{item['rn_code']}}">{{item["rn_last"]}}, {{item["rn_first"]}}</a></td>
+                <td><a href="/doctors/{{item['dr_code']}}">{{item["dr_last"]}}, {{item["dr_first"]}}</a></td>
+                <td><a href="/units/{{item['unit_id']}}">{{item["unit_name"]}}</a></td>
+            </tr>
+        {% endfor %}
+        </table>
+    </body>
+</html>

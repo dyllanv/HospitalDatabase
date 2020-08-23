@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheet.css') }}"/>
+    </head>
+    <body>
+        <h1>Inpatient Census: Goon Squad</h1>
+        <div class="menu">
+            <a href="/">Home</a>
+            <a href="/patients">Patients</a>
+            <a href="/units">Units</a>
+            <a class="active" href="/doctors">Doctors</a>
+            <a href="/nurses">Nurses</a>
+        </div>
+            <h1>{{data["doctor"]["dr_last"]}}, {{data["doctor"]["dr_first"]}}</h1>
+            <h3>Phone: {{data["doctor"]["phone"]}}</h3>
+            {% if data["doctor"]['on_duty'] %}
+                <h3>Duty: On</h3>
+            {% else %}
+                <h3>Duty: Off</h3>
+            {% endif %}
+
+            {% if data["doctor"]['in_house'] %}
+                <h3>In House: Yes</h3>
+            {% else %}
+                <h3>In House: No</h3>
+            {% endif %}
+
+            {% if data["doctor"]['attending'] %}
+                <h3>Attending</h3>
+            {% else %}
+                <h3>Resident</h3>
+            {% endif %}
+        <br>
+        <h2>Patients:</h2>
+        <table id="patientsTable">
+            <thead>
+                <tr>
+                    <th>Patient ID
+                    <th>Name
+                    <th>Sex
+                    <th>DOB
+                    <th>Admit Date
+                    <th>Ant. Discharge
+                    <th>Dx
+                    <th>Code
+                    <th>Room
+                    <th>Nurse
+                    <th>Doctor
+                    <th>Unit
+
+        {% for item in data["patients"] %}
+            <tr>
+                <td>{{item["pat_id"]}}</td>
+                <td><a href="/patients/{{item['pat_id']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                <td>{{item["sex"]}}</td>
+                <td>{{item["dob"]}}</td>
+                <td>{{item["admit_date"]}}</td>
+                <td>{{item["anticipated_discharge"]}}</td>
+                <td>{{item["diagnosis"]}}</td>
+                <td>{{item["code_status"]}}</td>
+                <td>{{item["room"]}}</td>
+                <td><a href="/nurses/{{item['rn_code']}}">{{item["rn_last"]}}, {{item["rn_first"]}}</a></td>
+                <td><a href="/doctors/{{data['doctor']['dr_code']}}">{{data["doctor"]["dr_last"]}}, {{data["doctor"]["dr_first"]}}</a></td>
+                <td><a href="/units/{{item['unit_id']}}">{{item["name"]}}</a></td>
+            </tr>
+        {% endfor %}
+        </table>
+
+        <h2> Update Info</h2>
+        <form action="/doctors/{{data['doctor']['dr_code']}}" method="POST">
+            <fieldset>
+            <input type="hidden" name="_method" value="UPDATE">
+            <input type="hidden" name="dr_code" value={{data['doctor']['dr_code']}}>
+            <input type="hidden" id="id">
+            Last Name<input type="text" name="lname" value="{{data['doctor']['dr_last']}}" required>
+            First Name<input type="text" name="fname" value="{{data['doctor']['dr_first']}}" required>
+            Phone<input type="tel" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value="{{data['doctor']['phone']}}" required>
+            {% if not data["doctor"]['dr_sex'] %}
+                <input type="radio" name="sex" value="0" checked=True>female
+                <input type="radio" name="sex" value="1" >male
+            {% else %}
+                <input type="radio" name="sex" value="0" >female
+                <input type="radio" name="sex" value="1" checked=True>male
+            {% endif %}
+            <br />
+            {% if data["doctor"]['on_duty'] %}
+                <input type="radio" name="duty" value="1" checked=True>On Duty 
+                <input type="radio" name="duty" value="0">Off Duty
+            {% else %}
+                <input type="radio" name="duty" value="1">On Duty 
+                <input type="radio" name="duty" value="0" checked=True>Off Duty
+            {% endif %}
+            <br />
+            {% if data["doctor"]['in_house'] %}
+                <input type="radio" name="house" value="1" checked=True>In House
+                <input type="radio" name="house" value="0">Out of House
+            {% else %}
+                <input type="radio" name="house" value="1">In House
+                <input type="radio" name="house" value="0" checked=True>Out of House
+            {% endif %}
+            <br />
+            {% if data["doctor"]['attending'] %}
+                <input type="radio" name="att_res" value="1" checked=True>Attending
+                <input type="radio" name="att_res" value="0">Resident
+            {% else %}
+                <input type="radio" name="att_res" value="1">Attending
+                <input type="radio" name="att_res" value="0" checked=True>Resident
+            {% endif %}
+            
+            <br />
+            <input type="submit" value="Update">
+            </fieldset>
+        </form>
+    </body>
+</html>

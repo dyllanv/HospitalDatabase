@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheet.css') }}"/>
+    </head>
+    <body>
+        <h1>Inpatient Census: Goon Squad</h1>
+        <div class="menu">
+            <a href="/">Home</a>
+            <a href="/patients">Patients</a>
+            <a class="active" href="/units">Units</a>
+            <a href="/doctors">Doctors</a>
+            <a href="/nurses">Nurses</a>
+        </div>
+        <h1>{{data["unit"]["name"]}}</h1>
+        
+        {% for item in data["doctors"] %}
+            {% if item["dr_code"] == data["unit"]["dept_head"] %}  
+                <h2> Dept head: <a href="/doctors/{{item['dr_code']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></h2>
+            {% endif %}
+        {% endfor %}
+        <h3>Phone: {{data["unit"]["phone"]}}</h3>
+        <h2>Patients:</h2>
+        <table id="patientsTable">
+            <thead>
+                <tr>
+                    <th>Patient ID
+                    <th>Name
+                    <th>Sex
+                    <th>DOB
+                    <th>Admit Date
+                    <th>Ant. Discharge
+                    <th>Dx
+                    <th>Code
+                    <th>Room
+                    <th>Nurse
+                    <th>Doctor
+                    <th>Unit
+                    <th>Delete</th>
+
+        {% for item in data["patients"] %}
+            <tr>
+                <td>{{item["pat_id"]}}</a></td>
+                <td><a href="/patients/{{item['pat_id']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                <td>{{item["sex"]}}</td>
+                <td>{{item["dob"]}}</td>
+                <td>{{item["admit_date"]}}</td>
+                <td>{{item["anticipated_discharge"]}}</td>
+                <td>{{item["diagnosis"]}}</td>
+                <td>{{item["code_status"]}}</td>
+                <td>{{item["room"]}}</td>
+                <td><a href="/nurses/{{item['rn_code']}}">{{item["rn_last"]}}, {{item["rn_first"]}}</a></td>
+                <td><a href="/doctors/{{item['dr_code']}}">{{item["dr_last"]}}, {{item["dr_first"]}}</a></td>
+                <td><a href="/units/{{item['unit_id']}}">{{item["name"]}}</a></td>
+                <td>
+                    <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="pat_id" value="{{item['pat_id']}}">
+                        <input type="submit" id="delete", value="Delete">
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+        <br>
+        <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+            <input type="hidden" name="_method" value="FILTER">
+            <input type="checkbox" name="on_duty" value="1" {% if data["search"] %} checked {% endif %}>
+            <label>On duty staff only</label>
+            <input type="submit" value="Filter">
+        </form>
+        <h2>Doctors:</h2>
+        <table id="doctorsTable">
+            <thead>
+            <tr>
+                <th>DR Code</th>
+                <th>Name
+                <th>Sex
+                <th>On Duty
+                <th>In House
+                <th>Attending
+                <th>Phone
+                <th>Remove
+        {% if data["search"] %}
+            {% for item in data["doctors"] %}
+                {% if item["on_duty"] %}
+                    <tr>
+                        <td>{{item["dr_code"]}}</td>
+                        <td><a href="/doctors/{{item['dr_code']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                        {% if not item['sex'] %}
+                            <td>Female</td>
+                        {% else %}
+                            <td>Male</td>
+                        {% endif %}
+                            <td>On Duty</td>
+                        {% if not item['in_house'] %}
+                            <td>Out</td>
+                        {% else %}
+                            <td>In House</td>
+                        {% endif %}
+                        {% if not item['attending'] %}
+                            <td>Resident</td>
+                        {% else %}
+                            <td>Attending</td>
+                        {% endif %}
+                        <td>{{item["phone"]}}</td>
+                        <td>
+                            <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+                                <input type="hidden" name="_method" value="REMOVE DR">
+                                <input type="hidden" name="unit_id" value="{{data['unit']['unit_id']}}">
+                                <input type="hidden" value={{item["dr_code"]}}>
+                                <input type="submit" id="delete", value="Remove">
+                            </form>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {% for item in data["doctors"] %}
+                <tr>
+                    <td>{{item["dr_code"]}}</td>
+                    <td><a href="/doctors/{{item['dr_code']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                    {% if not item['sex'] %}
+                        <td>Female</td>
+                    {% else %}
+                        <td>Male</td>
+                    {% endif %}
+                    {% if not item['on_duty'] %}
+                        <td>Off</td>
+                    {% else %}
+                        <td>On Duty</td>
+                    {% endif %}
+                    {% if not item['in_house'] %}
+                        <td>Out</td>
+                    {% else %}
+                        <td>In House</td>
+                    {% endif %}
+                    {% if not item['attending'] %}
+                        <td>Resident</td>
+                    {% else %}
+                        <td>Attending</td>
+                    {% endif %}
+                    <td>{{item["phone"]}}</td>
+                    <td>
+                        <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+                            <input type="hidden" name="_method" value="REMOVE DR">
+                            <input type="hidden" name="unit_id" value="{{data['unit']['unit_id']}}">
+                            <input type="hidden" name="dr_code" value={{item["dr_code"]}}>
+                            <input type="submit" id="delete", value="Remove">
+                        </form>
+                    </td>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+        </table>
+
+        <h2>Nurses:</h2>
+            <table id="nursesTable">
+                <thead>
+                <tr>
+                    <th>RN Code</th>
+                    <th>Name
+                    <th>Sex
+                    <th>On Duty
+                    <th>Phone
+                    <th>Remove
+            
+        {% if data["search"] %}
+            {% for item in data["nurses"] %}
+                {% if item["on_duty"] %}
+                    <tr>
+                        <td>{{item["rn_code"]}}</td>
+                        <td><a href="/nurses/{{item['rn_code']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                        {% if not item['sex'] %}
+                            <td>Female</td>
+                        {% else %}
+                            <td>Male</td>
+                        {% endif %}
+                            <td>On Duty</td>
+                        <td>{{item["phone"]}}</td>
+                        <td>
+                            <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+                                <input type="hidden" name="_method" value="REMOVE RN">
+                                <input type="hidden" name="unit_id" value="{{data['unit']['unit_id']}}">
+                                <input type="hidden" name="rn_code" value={{item["rn_code"]}}>
+                                <input type="submit" id="delete", value="Remove">
+                            </form>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {% for item in data["nurses"] %}
+                <tr>
+                    <td>{{item["rn_code"]}}</td>
+                    <td><a href="/nurses/{{item['rn_code']}}">{{item["last_name"]}}, {{item["first_name"]}}</a></td>
+                    {% if not item['sex'] %}
+                        <td>Female</td>
+                    {% else %}
+                        <td>Male</td>
+                    {% endif %}
+                    {% if not item['on_duty'] %}
+                        <td>Off</td>
+                    {% else %}
+                        <td>On Duty</td>
+                    {% endif %}
+                    <td>{{item["phone"]}}</td>
+                    <td>
+                        <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+                            <input type="hidden" name="_method" value="REMOVE RN">
+                            <input type="hidden" name="unit_id" value="{{data['unit']['unit_id']}}">
+                            <input type="hidden" name="rn_code" value={{item["rn_code"]}}>
+                            <input type="submit" id="delete", value="Remove">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+            </table>
+        
+            <h2>Add New Patient</h2>
+            <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+                <fieldset>
+                    <input type="hidden" name="_method" value="ADD">
+                    <input type="hidden" name="unit_id" value="{{data['unit']['unit_id']}}">
+                    Last Name<input type="text" name="lname" placeholder="Last Name" required>
+                    First Name<input type="text" name="fname" placeholder="First Name" required>
+                    DOB<input type="date" name="dob" required>
+                    <input type="radio" name="sex" value="0" checked=True>female<input type="radio" name="sex" value="1">male
+                    Room<input type="text" name="room" placeholder="Room #" required>
+                    <br />
+                    <br />
+                    Admit Date<input type="date" name="admit" required>
+                    Anticipated Discharge<input type="date" name="ant_dis">
+                    <br />
+                    <br />
+                    Diagnosis<input type="text" name="diagnosis" placeholder="Diagnosis" required>
+                    Code Status
+                    <select name="code">
+                        <option value="Full">Full</option>
+                        <option value="Limited">Limited</option>
+                        <option value="DNR">DNR</option>
+                        <option value="Comfort">Comfort</option>
+                    </select> 
+                    <br />
+                    <br />
+                    Current Doctor:
+                    <select name="doctor">
+                        {% for item in data["doctors"] %}
+                            <option value={{item["dr_code"]}}>{{item["last_name"]}}, {{item["first_name"]}}</option>
+                        {% endfor %}
+                    </select> 
+                    Current Nurse:
+                    <select name="nurse">
+                        {% for item in data["nurses"] %}
+                            <option value={{item["rn_code"]}}>{{item["last_name"]}}, {{item["first_name"]}}</option>
+                        {% endfor %}
+                    </select>  
+                    <br />
+                    <input type="submit" id="add" value="Add Patient">
+                </fieldset>
+            </form>
+
+        <h2> Update Unit Info</h2>
+        <form action="/units/{{data['unit']['unit_id']}}" method="POST">
+            <fieldset>
+            <input type="hidden" name="_method" value="UPDATE">
+            <input type="hidden" name="unit_id" value={{data['unit']['unit_id']}}>
+            Unit Name<input type="text" name="name" value="{{data['unit']['name']}}" required>
+            Deptartment Head            
+            <select name="dept_head">
+                {% for item in data["doctors"] %}
+                    <option name="dept_head" value={{item["dr_code"]}} {% if item["dr_code"] == data['unit']["dept_head"] %} selected {% endif %}>{{item["last_name"]}}, {{item["first_name"]}} </option>
+                {% endfor %}
+            </select> 
+            Phone<input type="tel" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" value={{data['unit']['phone']}} required>
+            <input type="submit" id="add", value="Update">
+            </fieldset>
+        </form>
+    </body>
+</html>

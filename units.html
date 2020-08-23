@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheet.css') }}"/>
+    </head>
+    <body>
+        <h1>Inpatient Census: Goon Squad</h1>
+        <div class="menu">
+            <a href="/">Home</a>
+            <a href="/patients">Patients</a>
+            <a class="active" href="/units">Units</a>
+            <a href="/doctors">Doctors</a>
+            <a href="/nurses">Nurses</a>
+        </div>
+        <h1>Units:</h1>
+            <table id="unitsTable">
+                <thead>
+                <tr>
+                    <th>Unit ID</th>
+                    <th>Name
+                    <th>Dept Head
+                    <th>Phone
+            {% for item in data["units"] %}
+                <tr>
+                    <td>{{item["unit_id"]}}</td>
+                    <td><a href="/units/{{item['unit_id']}}">{{item["name"]}}</a></td>
+                    <td><a href="/doctors/{{item['dept_head']}}">{{item["head_name"]}}</a></td>
+                    <td>{{item["phone"]}}</td>
+
+                </tr>
+            {% endfor %}                
+            </table>
+        <h2>Add New Unit</h2>
+        <form action="/units" method="POST">
+            <fieldset>
+                <input type="hidden" name="_method" value="ADD">
+                <input type="hidden" id="id">
+                Unit Name<input type="text" name="name" placeholder="Unit Name" required>
+                Deptartment Head<select name="dept_head">
+                {% for item in data["doctors"] %}
+                    <option name="head" value={{item["dr_code"]}}>{{item["first_name"]}} {{item["last_name"]}}</option>
+                {% endfor %}
+            </select> 
+            Phone<input type="tel" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="XXX-XXX-XXXX" required>
+            <input type="submit" id="add", value="Add Unit">
+            </fieldset>
+        </form>
+    </body>
+</html>
