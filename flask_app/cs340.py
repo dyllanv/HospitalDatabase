@@ -183,7 +183,7 @@ def insert_nurses_units(rn_code, unit_id):
         print("Nurse already assigned to unit")
     else:
         query = "INSERT INTO NursesUnits (`rn_code`, `unit_id`) VALUES (%s, %s);"
-        connect_to_database(query, "POST")
+        connect_to_database(query, "POST", values)
 
 
 def remove_nurses_units(rn_code, unit_id):
